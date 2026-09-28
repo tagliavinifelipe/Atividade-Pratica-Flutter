@@ -38,4 +38,23 @@ void main() {
     expect(find.text('Smartphone removido'), findsOneWidget);
     expect(find.widgetWithText(ListTile, 'Smartphone'), findsNothing);
   });
+
+  testWidgets('tocar no card abre os detalhes e o botao volta ao catalogo', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const MeuApp());
+
+    await tester.tap(find.text('Notebook'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Voltar ao Catálogo'), findsOneWidget);
+    expect(find.text('ID: 2'), findsOneWidget);
+
+    await tester.tap(find.text('Voltar ao Catálogo'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Voltar ao Catálogo'), findsNothing);
+    expect(find.text('Catálogo de Produtos'), findsOneWidget);
+    expect(find.text('Itens: 5'), findsOneWidget);
+  });
 }
