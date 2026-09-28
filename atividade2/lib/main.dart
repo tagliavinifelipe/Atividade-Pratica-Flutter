@@ -93,6 +93,11 @@ class _TelaContadorState extends State<TelaContador> {
                   ),
                 ],
               ),
+              const SizedBox(height: 16),
+              OutlinedButton(
+                onPressed: () => setState(() => _quantidade = 1),
+                child: const Text('Zerar Contador'),
+              ),
               const SizedBox(height: 32),
               ElevatedButton(
                 onPressed: () {

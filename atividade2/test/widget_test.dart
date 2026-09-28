@@ -41,6 +41,17 @@ void main() {
     expect(quantidadeAtual(tester), '2');
   });
 
+  testWidgets('zerar contador volta a quantidade para 1',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const MeuApp());
+    await tocarAdicionar(tester, 2);
+    expect(quantidadeAtual(tester), '3');
+
+    await tester.tap(find.text('Zerar Contador'));
+    await tester.pump();
+    expect(quantidadeAtual(tester), '1');
+  });
+
   testWidgets('avancar abre TelaResumo com os dados do pedido',
       (WidgetTester tester) async {
     await tester.pumpWidget(const MeuApp());
