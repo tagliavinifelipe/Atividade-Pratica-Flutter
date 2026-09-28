@@ -25,4 +25,17 @@ void main() {
     expect(find.text('Itens: 6'), findsOneWidget);
     expect(find.text('Novo Produto 6'), findsOneWidget);
   });
+
+  testWidgets('deslizar o card para a esquerda remove o produto', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const MeuApp());
+
+    await tester.drag(find.text('Smartphone'), const Offset(-500, 0));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Itens: 4'), findsOneWidget);
+    expect(find.text('Smartphone removido'), findsOneWidget);
+    expect(find.widgetWithText(ListTile, 'Smartphone'), findsNothing);
+  });
 }
