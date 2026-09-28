@@ -52,6 +52,16 @@ void main() {
     expect(quantidadeAtual(tester), '1');
   });
 
+  testWidgets('total e recalculado conforme a quantidade',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const MeuApp());
+    expect(find.text('Preço unitário: R\$ 150.00'), findsOneWidget);
+    expect(find.text('Total: R\$ 150.00'), findsOneWidget);
+
+    await tocarAdicionar(tester, 1);
+    expect(find.text('Total: R\$ 300.00'), findsOneWidget);
+  });
+
   testWidgets('avancar abre TelaResumo com os dados do pedido',
       (WidgetTester tester) async {
     await tester.pumpWidget(const MeuApp());
@@ -62,5 +72,6 @@ void main() {
     expect(find.text('Resumo do Pedido'), findsOneWidget);
     expect(find.text('Item: Smartphone Galaxy S24'), findsOneWidget);
     expect(find.text('Quantidade Selecionada: 2'), findsOneWidget);
+    expect(find.text('Valor Total: R\$ 300.00'), findsOneWidget);
   });
 }

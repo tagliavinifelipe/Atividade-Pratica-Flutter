@@ -33,6 +33,7 @@ class TelaContador extends StatefulWidget {
 class _TelaContadorState extends State<TelaContador> {
   int _quantidade = 1;
   final String _nomeProduto = 'Smartphone Galaxy S24';
+  static const double _precoUnitario = 150.00;
 
   void _incrementar() {
     setState(() {
@@ -50,6 +51,8 @@ class _TelaContadorState extends State<TelaContador> {
 
   @override
   Widget build(BuildContext context) {
+    final double total = _quantidade * _precoUnitario;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Seleção de Itens'),
@@ -68,6 +71,11 @@ class _TelaContadorState extends State<TelaContador> {
                   fontWeight: FontWeight.bold,
                 ),
                 textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Preço unitário: R\$ ${_precoUnitario.toStringAsFixed(2)}',
+                style: const TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 24),
               Row(
@@ -98,6 +106,14 @@ class _TelaContadorState extends State<TelaContador> {
                 onPressed: () => setState(() => _quantidade = 1),
                 child: const Text('Zerar Contador'),
               ),
+              const SizedBox(height: 24),
+              Text(
+                'Total: R\$ ${total.toStringAsFixed(2)}',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 32),
               ElevatedButton(
                 onPressed: () {
@@ -107,6 +123,7 @@ class _TelaContadorState extends State<TelaContador> {
                       builder: (context) => TelaResumo(
                         item: _nomeProduto,
                         quantidade: _quantidade,
+                        total: total,
                       ),
                     ),
                   );
