@@ -74,4 +74,28 @@ void main() {
     expect(find.text('Quantidade Selecionada: 2'), findsOneWidget);
     expect(find.text('Valor Total: R\$ 300.00'), findsOneWidget);
   });
+
+  testWidgets('confirmar pedido volta e exibe SnackBar',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const MeuApp());
+    await abrirResumo(tester);
+
+    await tester.tap(find.text('Confirmar Pedido'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Seleção de Itens'), findsOneWidget);
+    expect(find.text('Pedido Confirmado com Sucesso!'), findsOneWidget);
+  });
+
+  testWidgets('voltar e alterar volta sem SnackBar',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const MeuApp());
+    await abrirResumo(tester);
+
+    await tester.tap(find.text('Voltar e Alterar'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Seleção de Itens'), findsOneWidget);
+    expect(find.text('Pedido Confirmado com Sucesso!'), findsNothing);
+  });
 }

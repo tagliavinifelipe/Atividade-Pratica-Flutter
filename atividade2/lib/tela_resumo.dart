@@ -51,6 +51,12 @@ class TelaResumo extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 32),
+              FilledButton.icon(
+                onPressed: () => Navigator.pop(context, true),
+                icon: const Icon(Icons.check),
+                label: const Text('Confirmar Pedido'),
+              ),
+              const SizedBox(height: 12),
               ElevatedButton.icon(
                 onPressed: () => Navigator.pop(context),
                 icon: const Icon(Icons.arrow_back),
