@@ -49,6 +49,23 @@ class _CatalogoScreenState extends State<CatalogoScreen> {
     ),
   ];
 
+  int _proximoId = 6;
+
+  void _adicionarProduto() {
+    setState(() {
+      _produtos.add(
+        Produto(
+          id: _proximoId,
+          nome: 'Novo Produto $_proximoId',
+          preco: 99.90,
+          categoria: 'Diversos',
+          icone: '🆕',
+        ),
+      );
+      _proximoId++;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,6 +92,11 @@ class _CatalogoScreenState extends State<CatalogoScreen> {
             },
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _adicionarProduto,
+        tooltip: 'Adicionar produto',
+        child: const Icon(Icons.add),
       ),
     );
   }

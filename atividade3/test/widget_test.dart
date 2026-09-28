@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:atividade3/main.dart';
@@ -11,5 +12,17 @@ void main() {
     expect(find.text('Catálogo de Produtos'), findsOneWidget);
     expect(find.text('Itens: 5'), findsOneWidget);
     expect(find.text('Smartphone'), findsOneWidget);
+  });
+
+  testWidgets('FAB adiciona um novo produto e atualiza o contador', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const MeuApp());
+
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pump();
+
+    expect(find.text('Itens: 6'), findsOneWidget);
+    expect(find.text('Novo Produto 6'), findsOneWidget);
   });
 }
