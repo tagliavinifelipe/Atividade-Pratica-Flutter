@@ -20,6 +20,7 @@ class _FeedNoticiasScreenState extends State<FeedNoticiasScreen> {
   bool _isLoading = true;
   String? _mensagemErro;
   String _filtro = '';
+  bool _simularErro = false;
 
   List<NoticiaModel> get _noticiasFiltradas {
     final termo = _filtro.trim().toLowerCase();
@@ -43,7 +44,7 @@ class _FeedNoticiasScreenState extends State<FeedNoticiasScreen> {
     });
 
     try {
-      final noticias = await _service.buscarNoticias();
+      final noticias = await _service.buscarNoticias(simularErro: _simularErro);
       if (!mounted) return;
       setState(() {
         _noticias = noticias;
@@ -62,12 +63,40 @@ class _FeedNoticiasScreenState extends State<FeedNoticiasScreen> {
     }
   }
 
+  void _alternarSimulacaoErro() {
+    setState(() {
+      _simularErro = !_simularErro;
+    });
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(
+            _simularErro
+                ? 'Simulação de erro ativada'
+                : 'Simulação de erro desativada',
+          ),
+        ),
+      );
+
+    _carregarFeed();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Feed de Notícias'),
         actions: [
+          IconButton(
+            icon: Icon(
+              Icons.bug_report,
+              color: _simularErro ? Colors.red : null,
+            ),
+            tooltip: 'Simular erro de conexão',
+            onPressed: _alternarSimulacaoErro,
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Recarregar',
