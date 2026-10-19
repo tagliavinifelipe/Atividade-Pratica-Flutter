@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/noticia_model.dart';
 import '../services/noticia_service.dart';
+import 'detalhe_noticia_screen.dart';
 
 class FeedNoticiasScreen extends StatefulWidget {
   final NoticiaService? service;
@@ -157,6 +158,14 @@ class _FeedNoticiasScreenState extends State<FeedNoticiasScreen> {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DetalheNoticiaScreen(noticia: noticia),
+                ),
+              );
+            },
           ),
         );
       },
