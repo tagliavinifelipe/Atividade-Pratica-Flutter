@@ -18,6 +18,15 @@ class _FeedNoticiasScreenState extends State<FeedNoticiasScreen> {
   List<NoticiaModel> _noticias = [];
   bool _isLoading = true;
   String? _mensagemErro;
+  String _filtro = '';
+
+  List<NoticiaModel> get _noticiasFiltradas {
+    final termo = _filtro.trim().toLowerCase();
+    if (termo.isEmpty) return _noticias;
+    return _noticias
+        .where((noticia) => noticia.titulo.toLowerCase().contains(termo))
+        .toList();
+  }
 
   @override
   void initState() {
@@ -65,7 +74,26 @@ class _FeedNoticiasScreenState extends State<FeedNoticiasScreen> {
           ),
         ],
       ),
-      body: _construirCorpo(),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+            child: TextField(
+              decoration: const InputDecoration(
+                prefixIcon: Icon(Icons.search),
+                hintText: 'Buscar por título',
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (valor) {
+                setState(() {
+                  _filtro = valor;
+                });
+              },
+            ),
+          ),
+          Expanded(child: _construirCorpo()),
+        ],
+      ),
     );
   }
 
@@ -104,11 +132,16 @@ class _FeedNoticiasScreenState extends State<FeedNoticiasScreen> {
       return const Center(child: Text('Nenhuma notícia encontrada.'));
     }
 
+    final noticiasFiltradas = _noticiasFiltradas;
+    if (noticiasFiltradas.isEmpty) {
+      return const Center(child: Text('Nenhuma notícia corresponde à busca.'));
+    }
+
     // Estado: Sucesso
     return ListView.builder(
-      itemCount: _noticias.length,
+      itemCount: noticiasFiltradas.length,
       itemBuilder: (context, index) {
-        final noticia = _noticias[index];
+        final noticia = noticiasFiltradas[index];
         return Card(
           margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           child: ListTile(
