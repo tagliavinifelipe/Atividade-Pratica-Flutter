@@ -16,6 +16,7 @@ class FeedNoticiasScreen extends StatefulWidget {
 class _FeedNoticiasScreenState extends State<FeedNoticiasScreen> {
   late final NoticiaService _service;
   late Future<List<NoticiaModel>> _futureNoticias;
+  final Set<int> _favoritos = {};
 
   @override
   void initState() {
@@ -30,14 +31,39 @@ class _FeedNoticiasScreenState extends State<FeedNoticiasScreen> {
     });
   }
 
-  void _abrirDetalhes(NoticiaModel noticia) {
+  Future<void> _abrirDetalhes(NoticiaModel noticia) async {
     // Passa o objeto ja carregado; o detalhe nao faz nova requisicao.
-    Navigator.push(
+    final resultado = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
-        builder: (context) => DetalheNoticiaScreen(noticia: noticia),
+        builder: (context) => DetalheNoticiaScreen(
+          noticia: noticia,
+          favorita: _favoritos.contains(noticia.id),
+        ),
       ),
     );
+    if (!mounted) return;
+
+    // Voltar pela seta da AppBar retorna null: nada muda.
+    if (resultado == null) return;
+
+    setState(() {
+      if (resultado) {
+        _favoritos.add(noticia.id);
+      } else {
+        _favoritos.remove(noticia.id);
+      }
+    });
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(
+            resultado ? 'Adicionada aos favoritos' : 'Removida dos favoritos',
+          ),
+        ),
+      );
   }
 
   @override
@@ -113,7 +139,16 @@ class _FeedNoticiasScreenState extends State<FeedNoticiasScreen> {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   subtitle: Text(noticia.resumo),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (_favoritos.contains(noticia.id)) ...[
+                        const Icon(Icons.favorite, color: Colors.red),
+                        const SizedBox(width: 4),
+                      ],
+                      const Icon(Icons.arrow_forward_ios, size: 16),
+                    ],
+                  ),
                   onTap: () => _abrirDetalhes(noticia),
                 ),
               );

@@ -4,15 +4,33 @@ import '../models/noticia_model.dart';
 
 class DetalheNoticiaScreen extends StatelessWidget {
   final NoticiaModel noticia;
+  final bool favorita;
 
-  const DetalheNoticiaScreen({super.key, required this.noticia});
+  const DetalheNoticiaScreen({
+    super.key,
+    required this.noticia,
+    this.favorita = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Detalhes da Notícia')),
+      appBar: AppBar(
+        title: const Text('Detalhes da Notícia'),
+        actions: [
+          IconButton(
+            icon: Icon(
+              favorita ? Icons.favorite : Icons.favorite_border,
+              color: favorita ? Colors.red : null,
+            ),
+            tooltip: favorita ? 'Remover dos favoritos' : 'Favoritar',
+            // Devolve o novo estado para o feed (true = favoritou).
+            onPressed: () => Navigator.pop(context, !favorita),
+          ),
+        ],
+      ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
