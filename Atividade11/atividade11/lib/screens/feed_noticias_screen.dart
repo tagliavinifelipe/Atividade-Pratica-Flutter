@@ -39,6 +39,7 @@ class _FeedNoticiasScreenState extends State<FeedNoticiasScreen> {
         builder: (context) => DetalheNoticiaScreen(
           noticia: noticia,
           favorita: _favoritos.contains(noticia.id),
+          service: _service,
         ),
       ),
     );
