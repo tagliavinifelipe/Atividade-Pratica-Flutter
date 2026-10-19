@@ -17,19 +17,22 @@ class DetalheNoticiaScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.network(
-              noticia.urlImagem,
-              width: double.infinity,
-              height: 220,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  width: double.infinity,
-                  height: 220,
-                  color: Colors.grey[300],
-                  child: const Icon(Icons.broken_image, size: 64),
-                );
-              },
+            Hero(
+              tag: 'noticia-${noticia.id}',
+              child: Image.network(
+                noticia.urlImagem,
+                width: double.infinity,
+                height: 220,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    width: double.infinity,
+                    height: 220,
+                    color: Colors.grey[300],
+                    child: const Icon(Icons.broken_image, size: 64),
+                  );
+                },
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(16),

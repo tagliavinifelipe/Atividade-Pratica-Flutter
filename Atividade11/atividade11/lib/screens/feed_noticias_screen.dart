@@ -86,7 +86,26 @@ class _FeedNoticiasScreenState extends State<FeedNoticiasScreen> {
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 child: ListTile(
-                  leading: CircleAvatar(child: Text('${noticia.id}')),
+                  leading: Hero(
+                    tag: 'noticia-${noticia.id}',
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        noticia.urlImagem,
+                        width: 56,
+                        height: 56,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: 56,
+                            height: 56,
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.image_not_supported),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
                   title: Text(
                     noticia.titulo,
                     maxLines: 1,
