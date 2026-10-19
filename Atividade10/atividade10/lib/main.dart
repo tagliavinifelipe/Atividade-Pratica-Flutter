@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'screens/feed_noticias_screen.dart';
+import 'theme/tema_xp.dart';
 
 void main() {
   runApp(const MeuApp());
@@ -14,10 +15,7 @@ class MeuApp extends StatelessWidget {
     return MaterialApp(
       title: 'Aula 10 - Consumo de APIs',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
-        useMaterial3: true,
-      ),
+      theme: criarTemaXp(),
       home: const FeedNoticiasScreen(),
     );
   }

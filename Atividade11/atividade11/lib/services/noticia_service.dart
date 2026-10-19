@@ -6,14 +6,14 @@ import '../models/comentario_model.dart';
 import '../models/noticia_model.dart';
 
 class NoticiaService {
-  static const String _urlBase = 'https://jsonplaceholder.typicode.com/posts';
+  static const String urlBase = 'https://jsonplaceholder.typicode.com/posts';
 
   final http.Client _client;
 
   NoticiaService({http.Client? client}) : _client = client ?? http.Client();
 
   Future<List<NoticiaModel>> buscarNoticias() async {
-    final List<dynamic> dados = await _buscarLista(Uri.parse(_urlBase));
+    final List<dynamic> dados = await _buscarLista(Uri.parse(urlBase));
     return dados
         .map((json) => NoticiaModel.fromJson(json as Map<String, dynamic>))
         .toList();
@@ -21,7 +21,7 @@ class NoticiaService {
 
   Future<List<ComentarioModel>> buscarComentarios(int noticiaId) async {
     final List<dynamic> dados = await _buscarLista(
-      Uri.parse('$_urlBase/$noticiaId/comments'),
+      Uri.parse('$urlBase/$noticiaId/comments'),
     );
     return dados
         .map((json) => ComentarioModel.fromJson(json as Map<String, dynamic>))

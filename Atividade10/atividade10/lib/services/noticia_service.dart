@@ -5,15 +5,15 @@ import 'package:http/http.dart' as http;
 import '../models/noticia_model.dart';
 
 class NoticiaService {
-  static const String _urlBase = 'https://jsonplaceholder.typicode.com/posts';
-  static const String _urlInexistente = 'https://api-inexistente.invalid/posts';
+  static const String urlBase = 'https://jsonplaceholder.typicode.com/posts';
+  static const String urlInexistente = 'https://api-inexistente.invalid/posts';
 
   final http.Client _client;
 
   NoticiaService({http.Client? client}) : _client = client ?? http.Client();
 
   Future<List<NoticiaModel>> buscarNoticias({bool simularErro = false}) async {
-    final url = simularErro ? _urlInexistente : _urlBase;
+    final url = simularErro ? urlInexistente : urlBase;
     final http.Response response;
 
     // Erros de rede (sem conexao, DNS, timeout) sao tratados aqui.

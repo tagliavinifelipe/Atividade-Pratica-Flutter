@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'screens/feed_noticias_screen.dart';
+import 'theme/tema_web2.dart';
 
 void main() {
   runApp(const MeuApp());
@@ -14,10 +15,7 @@ class MeuApp extends StatelessWidget {
     return MaterialApp(
       title: 'Aula 11 - Master-Detail',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
-        useMaterial3: true,
-      ),
+      theme: criarTemaWeb2(),
       home: const FeedNoticiasScreen(),
     );
   }
