@@ -49,6 +49,42 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
     });
   }
 
+  Future<void> _redefinirPadroes() async {
+    final confirmado = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Redefinir Padrões'),
+        content: const Text(
+          'Todas as preferências salvas serão apagadas. Deseja continuar?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('Redefinir'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmado != true) return;
+    await _prefsService.limparTudo();
+
+    if (!mounted) return;
+    setState(() {
+      _nomeController.text = 'Usuário Convidado';
+      _modoEscuro = false;
+    });
+    widget.onTemaAlterado(false);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Preferências redefinidas para o padrão.')),
+    );
+  }
+
   String _formatarData(DateTime data) {
     String doisDigitos(int valor) => valor.toString().padLeft(2, '0');
 
@@ -116,6 +152,12 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                           onPressed: _salvarPreferencias,
                           icon: const Icon(Icons.save),
                           label: const Text('Salvar Alterações'),
+                        ),
+                        const SizedBox(height: 8),
+                        OutlinedButton.icon(
+                          onPressed: _redefinirPadroes,
+                          icon: const Icon(Icons.restore),
+                          label: const Text('Redefinir Padrões'),
                         ),
                         const SizedBox(height: 12),
                         Text(
