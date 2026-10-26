@@ -6,6 +6,7 @@ class PreferencesService {
   // Chaves privadas para evitar erros de digitação espalhados pelo app
   static const String _keyNomeUsuario = 'key_nome_usuario';
   static const String _keyModoEscuro = 'key_modo_escuro';
+  static const String _keyUltimoAcesso = 'key_ultimo_acesso';
 
   Future<void> salvarNomeUsuario(String nome) async {
     final prefs = await SharedPreferences.getInstance();
@@ -25,6 +26,19 @@ class PreferencesService {
   Future<bool> obterModoEscuro() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool(_keyModoEscuro) ?? false;
+  }
+
+  // DateTime não é um tipo suportado: gravamos como texto ISO 8601
+  Future<void> salvarUltimoAcesso(DateTime data) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_keyUltimoAcesso, data.toIso8601String());
+  }
+
+  Future<DateTime?> obterUltimoAcesso() async {
+    final prefs = await SharedPreferences.getInstance();
+    final valor = prefs.getString(_keyUltimoAcesso);
+    if (valor == null) return null;
+    return DateTime.tryParse(valor);
   }
 
   Future<void> limparTudo() async {

@@ -17,6 +17,7 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
 
   bool _modoEscuro = false;
   bool _carregando = true;
+  DateTime? _ultimoAcesso;
 
   @override
   void initState() {
@@ -34,13 +35,25 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
     final nome = await _prefsService.obterNomeUsuario();
     final modoEscuro = await _prefsService.obterModoEscuro();
 
+    // Lê o acesso anterior antes de sobrescrever com o acesso atual
+    final ultimoAcesso = await _prefsService.obterUltimoAcesso();
+    await _prefsService.salvarUltimoAcesso(DateTime.now());
+
     // A tela pode ter sido fechada enquanto o disco era lido
     if (!mounted) return;
     setState(() {
       _nomeController.text = nome;
       _modoEscuro = modoEscuro;
+      _ultimoAcesso = ultimoAcesso;
       _carregando = false;
     });
+  }
+
+  String _formatarData(DateTime data) {
+    String doisDigitos(int valor) => valor.toString().padLeft(2, '0');
+
+    return '${doisDigitos(data.day)}/${doisDigitos(data.month)}/${data.year} '
+        '${doisDigitos(data.hour)}:${doisDigitos(data.minute)}';
   }
 
   Future<void> _salvarPreferencias() async {
@@ -103,6 +116,14 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
                           onPressed: _salvarPreferencias,
                           icon: const Icon(Icons.save),
                           label: const Text('Salvar Alterações'),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          _ultimoAcesso == null
+                              ? 'Primeiro acesso'
+                              : 'Último acesso: ${_formatarData(_ultimoAcesso!)}',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.bodySmall,
                         ),
                       ],
                     ),
