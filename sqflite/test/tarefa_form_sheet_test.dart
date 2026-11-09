@@ -83,6 +83,22 @@ void main() {
     expect(tarefa.categoria, 'Estudos');
   });
 
+  testWidgets('botão não fica atrás da barra de navegação do sistema', (
+    tester,
+  ) async {
+    // Simula o edge-to-edge do Android 15+: barra de 48 px lógicos embaixo.
+    final dpr = tester.view.devicePixelRatio;
+    tester.view.padding = FakeViewPadding(bottom: 48 * dpr);
+    addTearDown(tester.view.resetPadding);
+    await abrirSheet(tester);
+
+    final alturaTela = tester.view.physicalSize.height / dpr;
+    const barra = 48;
+    final botao = tester.getRect(find.widgetWithText(ElevatedButton, 'Salvar'));
+
+    expect(botao.bottom, lessThanOrEqualTo(alturaTela - barra));
+  });
+
   testWidgets('modo edição vem com os campos preenchidos', (tester) async {
     final existente = TarefaModel(
       id: 42,

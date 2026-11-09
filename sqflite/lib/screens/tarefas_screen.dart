@@ -193,7 +193,10 @@ class _TarefasScreenState extends State<TarefasScreen>
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.only(bottom: 88),
+      // Espaço para o FAB e para a barra de navegação do sistema.
+      padding: EdgeInsets.only(
+        bottom: 88 + MediaQuery.paddingOf(context).bottom,
+      ),
       itemCount: _tarefas.length,
       itemBuilder: (context, index) {
         final tarefa = _tarefas[index];

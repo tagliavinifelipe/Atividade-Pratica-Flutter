@@ -77,7 +77,12 @@ class _TarefaFormSheetState extends State<TarefaFormSheet> {
         top: 16,
         left: 16,
         right: 16,
-        bottom: MediaQuery.viewInsetsOf(context).bottom + 16,
+        // Teclado (viewInsets) + barra de navegação do sistema (padding):
+        // no Android 15+ o app é edge-to-edge e a barra cobriria o botão.
+        bottom:
+            MediaQuery.viewInsetsOf(context).bottom +
+            MediaQuery.paddingOf(context).bottom +
+            16,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
