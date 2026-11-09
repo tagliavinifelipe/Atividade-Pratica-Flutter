@@ -11,7 +11,14 @@ class TarefasScreen extends StatefulWidget {
   State<TarefasScreen> createState() => _TarefasScreenState();
 }
 
-class _TarefasScreenState extends State<TarefasScreen> {
+class _TarefasScreenState extends State<TarefasScreen>
+    with SingleTickerProviderStateMixin {
+  // Aba 0 = "Todas"; as demais seguem TarefaModel.categorias.
+  late final TabController _tabController;
+  int _abaCarregada = 0;
+  // Descarta respostas de consultas antigas que terminem fora de ordem.
+  int _ultimaConsulta = 0;
+
   List<TarefaModel> _tarefas = [];
   ({int total, int concluidas}) _contagem = (total: 0, concluidas: 0);
   bool _carregando = true;
@@ -19,13 +26,36 @@ class _TarefasScreenState extends State<TarefasScreen> {
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(
+      length: TarefaModel.categorias.length + 1,
+      vsync: this,
+    )..addListener(_aoTrocarAba);
+    _carregarTarefas();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  String? get _categoriaSelecionada => _tabController.index == 0
+      ? null
+      : TarefaModel.categorias[_tabController.index - 1];
+
+  void _aoTrocarAba() {
+    if (_tabController.index == _abaCarregada) return;
+    _abaCarregada = _tabController.index;
     _carregarTarefas();
   }
 
   Future<void> _carregarTarefas() async {
-    final tarefas = await DatabaseHelper.instance.listarTarefas();
+    final consulta = ++_ultimaConsulta;
+    final tarefas = await DatabaseHelper.instance.listarTarefas(
+      categoria: _categoriaSelecionada,
+    );
     final contagem = await DatabaseHelper.instance.contarTarefas();
-    if (!mounted) return;
+    if (!mounted || consulta != _ultimaConsulta) return;
     setState(() {
       _tarefas = tarefas;
       _contagem = contagem;
@@ -37,7 +67,10 @@ class _TarefasScreenState extends State<TarefasScreen> {
     final resultado = await showModalBottomSheet<TarefaModel>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => TarefaFormSheet(tarefa: tarefa),
+      builder: (_) => TarefaFormSheet(
+        tarefa: tarefa,
+        categoriaInicial: _categoriaSelecionada ?? TarefaModel.categoriaPadrao,
+      ),
     );
     if (resultado == null) return;
 
@@ -76,6 +109,16 @@ class _TarefasScreenState extends State<TarefasScreen> {
             ),
           ),
         ],
+        bottom: TabBar(
+          controller: _tabController,
+          isScrollable: true,
+          tabAlignment: TabAlignment.start,
+          tabs: [
+            const Tab(text: 'Todas'),
+            for (final categoria in TarefaModel.categorias)
+              Tab(text: categoria),
+          ],
+        ),
       ),
       body: _construirCorpo(),
       floatingActionButton: FloatingActionButton(
@@ -91,7 +134,14 @@ class _TarefasScreenState extends State<TarefasScreen> {
       return const Center(child: CircularProgressIndicator());
     }
     if (_tarefas.isEmpty) {
-      return const Center(child: Text('Nenhuma tarefa cadastrada.'));
+      // Banco com dados e lista vazia = algum filtro está escondendo tudo.
+      return Center(
+        child: Text(
+          _contagem.total == 0
+              ? 'Nenhuma tarefa cadastrada.'
+              : 'Nenhuma tarefa encontrada.',
+        ),
+      );
     }
 
     return ListView.builder(
@@ -114,7 +164,20 @@ class _TarefasScreenState extends State<TarefasScreen> {
                     : TextDecoration.none,
               ),
             ),
-            subtitle: Text(tarefa.descricao),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(tarefa.descricao),
+                const SizedBox(height: 4),
+                Chip(
+                  label: Text(tarefa.categoria),
+                  labelStyle: Theme.of(context).textTheme.labelSmall,
+                  visualDensity: VisualDensity.compact,
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  padding: EdgeInsets.zero,
+                ),
+              ],
+            ),
             trailing: IconButton(
               tooltip: 'Excluir',
               icon: const Icon(Icons.delete, color: Colors.red),

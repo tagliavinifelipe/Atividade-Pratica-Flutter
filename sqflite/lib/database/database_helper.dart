@@ -22,7 +22,12 @@ class DatabaseHelper {
 
   Future<Database> _initDB(String filePath) async {
     final path = _caminhoTeste ?? join(await getDatabasesPath(), filePath);
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+    return await openDatabase(
+      path,
+      version: 2,
+      onCreate: _createDB,
+      onUpgrade: _upgradeDB,
+    );
   }
 
   Future<void> _createDB(Database db, int version) async {
@@ -31,9 +36,19 @@ class DatabaseHelper {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         titulo TEXT NOT NULL,
         descricao TEXT NOT NULL,
-        concluida INTEGER NOT NULL
+        concluida INTEGER NOT NULL,
+        categoria TEXT NOT NULL DEFAULT 'Geral'
       )
     ''');
+  }
+
+  // v1 -> v2: coluna categoria. Tarefas antigas ficam em 'Geral'.
+  Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute(
+        "ALTER TABLE tarefas ADD COLUMN categoria TEXT NOT NULL DEFAULT 'Geral'",
+      );
+    }
   }
 
   /// Fecha a conexão atual e faz a próxima abertura usar [caminho]
@@ -52,9 +67,15 @@ class DatabaseHelper {
     return await db.insert('tarefas', tarefa.toMap());
   }
 
-  Future<List<TarefaModel>> listarTarefas() async {
+  /// Lista as tarefas; com [categoria], filtra no próprio SQL.
+  Future<List<TarefaModel>> listarTarefas({String? categoria}) async {
     final db = await database;
-    final result = await db.query('tarefas', orderBy: 'id DESC');
+    final result = await db.query(
+      'tarefas',
+      where: categoria != null ? 'categoria = ?' : null,
+      whereArgs: categoria != null ? [categoria] : null,
+      orderBy: 'id DESC',
+    );
     return result.map((json) => TarefaModel.fromMap(json)).toList();
   }
 

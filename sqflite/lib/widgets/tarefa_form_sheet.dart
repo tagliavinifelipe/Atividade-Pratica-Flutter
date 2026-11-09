@@ -9,7 +9,14 @@ import '../models/tarefa_model.dart';
 class TarefaFormSheet extends StatefulWidget {
   final TarefaModel? tarefa;
 
-  const TarefaFormSheet({super.key, this.tarefa});
+  /// Categoria pré-selecionada ao criar (na edição vale a da tarefa).
+  final String categoriaInicial;
+
+  const TarefaFormSheet({
+    super.key,
+    this.tarefa,
+    this.categoriaInicial = TarefaModel.categoriaPadrao,
+  });
 
   @override
   State<TarefaFormSheet> createState() => _TarefaFormSheetState();
@@ -18,6 +25,7 @@ class TarefaFormSheet extends StatefulWidget {
 class _TarefaFormSheetState extends State<TarefaFormSheet> {
   late final TextEditingController _tituloController;
   late final TextEditingController _descricaoController;
+  late String _categoria;
   String? _erroTitulo;
 
   bool get _editando => widget.tarefa != null;
@@ -29,6 +37,7 @@ class _TarefaFormSheetState extends State<TarefaFormSheet> {
     _descricaoController = TextEditingController(
       text: widget.tarefa?.descricao,
     );
+    _categoria = widget.tarefa?.categoria ?? widget.categoriaInicial;
   }
 
   @override
@@ -47,8 +56,16 @@ class _TarefaFormSheetState extends State<TarefaFormSheet> {
 
     final descricao = _descricaoController.text.trim();
     final tarefa =
-        widget.tarefa?.copyWith(titulo: titulo, descricao: descricao) ??
-        TarefaModel(titulo: titulo, descricao: descricao);
+        widget.tarefa?.copyWith(
+          titulo: titulo,
+          descricao: descricao,
+          categoria: _categoria,
+        ) ??
+        TarefaModel(
+          titulo: titulo,
+          descricao: descricao,
+          categoria: _categoria,
+        );
 
     Navigator.pop(context, tarefa);
   }
@@ -87,6 +104,18 @@ class _TarefaFormSheetState extends State<TarefaFormSheet> {
           TextField(
             controller: _descricaoController,
             decoration: const InputDecoration(labelText: 'Descrição'),
+          ),
+          const SizedBox(height: 8),
+          DropdownButtonFormField<String>(
+            initialValue: _categoria,
+            decoration: const InputDecoration(labelText: 'Categoria'),
+            items: [
+              for (final categoria in TarefaModel.categorias)
+                DropdownMenuItem(value: categoria, child: Text(categoria)),
+            ],
+            onChanged: (valor) {
+              if (valor != null) setState(() => _categoria = valor);
+            },
           ),
           const SizedBox(height: 16),
           ElevatedButton(
