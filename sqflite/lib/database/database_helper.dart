@@ -67,16 +67,44 @@ class DatabaseHelper {
     return await db.insert('tarefas', tarefa.toMap());
   }
 
-  /// Lista as tarefas; com [categoria], filtra no próprio SQL.
-  Future<List<TarefaModel>> listarTarefas({String? categoria}) async {
+  /// Lista as tarefas filtrando no próprio SQL: [categoria] exata e/ou
+  /// [busca] (trecho do título ou da descrição). Filtros nulos são ignorados.
+  Future<List<TarefaModel>> listarTarefas({
+    String? categoria,
+    String? busca,
+  }) async {
     final db = await database;
+
+    final condicoes = <String>[];
+    final args = <Object>[];
+    if (categoria != null) {
+      condicoes.add('categoria = ?');
+      args.add(categoria);
+    }
+    final termo = busca?.trim() ?? '';
+    if (termo.isNotEmpty) {
+      final padrao = '%${_escaparLike(termo)}%';
+      condicoes.add(
+        r"(titulo LIKE ? ESCAPE '\' OR descricao LIKE ? ESCAPE '\')",
+      );
+      args.addAll([padrao, padrao]);
+    }
+
     final result = await db.query(
       'tarefas',
-      where: categoria != null ? 'categoria = ?' : null,
-      whereArgs: categoria != null ? [categoria] : null,
+      where: condicoes.isEmpty ? null : condicoes.join(' AND '),
+      whereArgs: args.isEmpty ? null : args,
       orderBy: 'id DESC',
     );
     return result.map((json) => TarefaModel.fromMap(json)).toList();
+  }
+
+  // Faz %, _ e \ digitados pelo usuário valerem como texto literal no LIKE.
+  static String _escaparLike(String termo) {
+    return termo
+        .replaceAll(r'\', r'\\')
+        .replaceAll('%', r'\%')
+        .replaceAll('_', r'\_');
   }
 
   // Contagem geral, sem filtro: alimenta o "X/Y concluídas" do AppBar.

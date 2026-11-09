@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../database/database_helper.dart';
@@ -19,6 +21,9 @@ class _TarefasScreenState extends State<TarefasScreen>
   // Descarta respostas de consultas antigas que terminem fora de ordem.
   int _ultimaConsulta = 0;
 
+  final _buscaController = TextEditingController();
+  Timer? _debounce;
+
   List<TarefaModel> _tarefas = [];
   ({int total, int concluidas}) _contagem = (total: 0, concluidas: 0);
   bool _carregando = true;
@@ -35,6 +40,8 @@ class _TarefasScreenState extends State<TarefasScreen>
 
   @override
   void dispose() {
+    _debounce?.cancel();
+    _buscaController.dispose();
     _tabController.dispose();
     super.dispose();
   }
@@ -53,6 +60,7 @@ class _TarefasScreenState extends State<TarefasScreen>
     final consulta = ++_ultimaConsulta;
     final tarefas = await DatabaseHelper.instance.listarTarefas(
       categoria: _categoriaSelecionada,
+      busca: _buscaController.text,
     );
     final contagem = await DatabaseHelper.instance.contarTarefas();
     if (!mounted || consulta != _ultimaConsulta) return;
@@ -61,6 +69,18 @@ class _TarefasScreenState extends State<TarefasScreen>
       _contagem = contagem;
       _carregando = false;
     });
+  }
+
+  // Espera o usuário parar de digitar antes de consultar o banco.
+  void _aoBuscar(String _) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), _carregarTarefas);
+  }
+
+  void _limparBusca() {
+    _debounce?.cancel();
+    _buscaController.clear();
+    _carregarTarefas();
   }
 
   Future<void> _abrirFormulario([TarefaModel? tarefa]) async {
@@ -120,7 +140,35 @@ class _TarefasScreenState extends State<TarefasScreen>
           ],
         ),
       ),
-      body: _construirCorpo(),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+            child: ValueListenableBuilder<TextEditingValue>(
+              valueListenable: _buscaController,
+              builder: (context, valor, _) => TextField(
+                controller: _buscaController,
+                onChanged: _aoBuscar,
+                textInputAction: TextInputAction.search,
+                decoration: InputDecoration(
+                  hintText: 'Buscar por título ou descrição',
+                  prefixIcon: const Icon(Icons.search),
+                  suffixIcon: valor.text.isEmpty
+                      ? null
+                      : IconButton(
+                          tooltip: 'Limpar busca',
+                          icon: const Icon(Icons.clear),
+                          onPressed: _limparBusca,
+                        ),
+                  border: const OutlineInputBorder(),
+                  isDense: true,
+                ),
+              ),
+            ),
+          ),
+          Expanded(child: _construirCorpo()),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         tooltip: 'Nova tarefa',
         onPressed: () => _abrirFormulario(),
