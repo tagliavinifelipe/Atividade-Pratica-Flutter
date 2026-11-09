@@ -58,6 +58,20 @@ class DatabaseHelper {
     return result.map((json) => TarefaModel.fromMap(json)).toList();
   }
 
+  // Contagem geral, sem filtro: alimenta o "X/Y concluídas" do AppBar.
+  Future<({int total, int concluidas})> contarTarefas() async {
+    final db = await database;
+    final result = await db.rawQuery(
+      'SELECT COUNT(*) AS total, COALESCE(SUM(concluida), 0) AS concluidas '
+      'FROM tarefas',
+    );
+    final linha = result.first;
+    return (
+      total: linha['total'] as int,
+      concluidas: linha['concluidas'] as int,
+    );
+  }
+
   Future<int> atualizarTarefa(TarefaModel tarefa) async {
     final db = await database;
     return await db.update(

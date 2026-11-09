@@ -13,6 +13,7 @@ class TarefasScreen extends StatefulWidget {
 
 class _TarefasScreenState extends State<TarefasScreen> {
   List<TarefaModel> _tarefas = [];
+  ({int total, int concluidas}) _contagem = (total: 0, concluidas: 0);
   bool _carregando = true;
 
   @override
@@ -23,9 +24,11 @@ class _TarefasScreenState extends State<TarefasScreen> {
 
   Future<void> _carregarTarefas() async {
     final tarefas = await DatabaseHelper.instance.listarTarefas();
+    final contagem = await DatabaseHelper.instance.contarTarefas();
     if (!mounted) return;
     setState(() {
       _tarefas = tarefas;
+      _contagem = contagem;
       _carregando = false;
     });
   }
@@ -61,7 +64,19 @@ class _TarefasScreenState extends State<TarefasScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Tarefas SQLite')),
+      appBar: AppBar(
+        title: const Text('Tarefas SQLite'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: Center(
+              child: Text(
+                '${_contagem.concluidas}/${_contagem.total} concluídas',
+              ),
+            ),
+          ),
+        ],
+      ),
       body: _construirCorpo(),
       floatingActionButton: FloatingActionButton(
         tooltip: 'Nova tarefa',
