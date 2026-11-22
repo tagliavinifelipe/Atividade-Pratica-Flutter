@@ -14,14 +14,13 @@ class LocationService {
     if (permissao == LocationPermission.denied) {
       permissao = await Geolocator.requestPermission();
       if (permissao == LocationPermission.denied) {
-        throw Exception('A permissão de localização foi negada.');
+        throw Exception('Permissão de localização negada pelo usuário.');
       }
     }
 
     if (permissao == LocationPermission.deniedForever) {
       throw Exception(
-        'A permissão de localização foi negada permanentemente. '
-        'Habilite-a nas configurações do aparelho.',
+        'Permissões negadas permanentemente. Altere nas configurações.',
       );
     }
 
