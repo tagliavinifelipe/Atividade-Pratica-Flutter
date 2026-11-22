@@ -12,7 +12,7 @@ class MeuApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Aula 14 - GPS',
-      // O roteiro usa Colors.sky, que não existe no Flutter.
+      // A cor "sky" do roteiro não existe no Flutter; usamos lightBlue.
       theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.lightBlue),
       home: const GeolocalizacaoScreen(),
     );
