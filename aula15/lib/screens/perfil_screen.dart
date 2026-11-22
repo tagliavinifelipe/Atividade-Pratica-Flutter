@@ -3,13 +3,19 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import '../services/media_service.dart';
+import '../services/perfil_storage.dart';
 import 'foto_tela_cheia_screen.dart';
 
 class PerfilScreen extends StatefulWidget {
-  PerfilScreen({super.key, MediaService? mediaService})
-    : mediaService = mediaService ?? MediaService();
+  PerfilScreen({
+    super.key,
+    MediaService? mediaService,
+    PerfilStorage? perfilStorage,
+  }) : mediaService = mediaService ?? MediaService(),
+       perfilStorage = perfilStorage ?? PerfilStorage();
 
   final MediaService mediaService;
+  final PerfilStorage perfilStorage;
 
   @override
   State<PerfilScreen> createState() => _PerfilScreenState();
@@ -19,6 +25,26 @@ class _PerfilScreenState extends State<PerfilScreen> {
   final TextEditingController _nomeController = TextEditingController();
   File? _imagemPerfil;
 
+  @override
+  void initState() {
+    super.initState();
+    _carregarFotoSalva();
+  }
+
+  Future<void> _carregarFotoSalva() async {
+    final File? foto = await widget.perfilStorage.carregarFoto();
+    if (!mounted) return;
+    if (foto == null) return;
+    setState(() {
+      _imagemPerfil = foto;
+    });
+  }
+
+  void _mostrarMensagem(String mensagem) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(mensagem)));
+  }
+
   Future<void> _capturarImagem({required bool daCamera}) async {
     File? imagem;
     try {
@@ -27,24 +53,32 @@ class _PerfilScreenState extends State<PerfilScreen> {
           : await widget.mediaService.selecionarDaGaleria();
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Não foi possível obter a imagem.')),
-      );
+      _mostrarMensagem('Não foi possível obter a imagem.');
       return;
     }
 
     if (!mounted) return;
     if (imagem == null) return;
 
+    File fotoFinal = imagem;
+    try {
+      fotoFinal = await widget.perfilStorage.salvarFoto(imagem);
+    } catch (_) {
+      if (!mounted) return;
+      _mostrarMensagem('A foto não pôde ser salva para a próxima abertura.');
+    }
+
+    if (!mounted) return;
     setState(() {
-      _imagemPerfil = imagem;
+      _imagemPerfil = fotoFinal;
     });
   }
 
-  void _removerFoto() {
+  Future<void> _removerFoto() async {
     setState(() {
       _imagemPerfil = null;
     });
+    await widget.perfilStorage.removerFoto();
   }
 
   void _abrirTelaCheia() {
