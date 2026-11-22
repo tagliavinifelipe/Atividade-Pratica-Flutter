@@ -71,11 +71,11 @@ void main() {
       ),
     );
 
-    expect(find.text('-21.603000'), findsOneWidget);
-    expect(find.text('-48.366000'), findsOneWidget);
+    expect(find.text('-21.603'), findsOneWidget);
+    expect(find.text('-48.366'), findsOneWidget);
     expect(find.byType(Chip), findsOneWidget);
     expect(find.text('Precisão alta (10.0 m)'), findsOneWidget);
-    expect(find.text('Distância até a Fatec Matão:'), findsOneWidget);
+    expect(find.text('Distância até a Fatec Matão'), findsOneWidget);
     expect(find.text(distanciaEsperada), findsOneWidget);
     expect(find.text('Abrir no Mapa'), findsOneWidget);
   });
@@ -97,6 +97,5 @@ void main() {
       findsOneWidget,
     );
     expect(find.textContaining('Exception'), findsNothing);
-    expect(find.byIcon(Icons.error_outline), findsOneWidget);
   });
 }

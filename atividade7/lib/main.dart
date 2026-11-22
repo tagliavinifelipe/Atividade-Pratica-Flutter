@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'screens/geolocalizacao_screen.dart';
 
-void main() {
-  runApp(const MeuApp());
-}
+void main() => runApp(const MeuApp());
 
 class MeuApp extends StatelessWidget {
   const MeuApp({super.key});
@@ -12,13 +10,11 @@ class MeuApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Aula 14 - GPS',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.lightBlue),
-        useMaterial3: true,
-      ),
-      home: GeolocalizacaoScreen(),
+      title: 'Aula 14 - GPS',
+      // O roteiro usa Colors.sky, que não existe no Flutter.
+      theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.lightBlue),
+      home: const GeolocalizacaoScreen(),
     );
   }
 }
