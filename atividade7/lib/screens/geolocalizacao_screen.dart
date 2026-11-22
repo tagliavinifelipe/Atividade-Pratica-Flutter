@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../services/location_service.dart';
 import '../utils/constantes.dart';
@@ -87,6 +88,27 @@ class _GeolocalizacaoScreenState extends State<GeolocalizacaoScreen> {
         });
       },
     );
+  }
+
+  Future<void> _abrirNoMapa(Position posicao) async {
+    final Uri url = Uri.parse(
+      'https://maps.google.com/?q=${posicao.latitude},${posicao.longitude}',
+    );
+
+    bool abriu;
+    try {
+      abriu = await launchUrl(url, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      abriu = false;
+    }
+
+    if (!abriu && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Não foi possível abrir o mapa neste dispositivo.'),
+        ),
+      );
+    }
   }
 
   @override
@@ -242,6 +264,19 @@ class _GeolocalizacaoScreenState extends State<GeolocalizacaoScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
             ),
+            if (posicao != null) ...[
+              const SizedBox(height: 12),
+              ElevatedButton.icon(
+                onPressed: () => _abrirNoMapa(posicao),
+                icon: const Icon(Icons.map),
+                label: const Text('Abrir no Mapa'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+              ),
+            ],
           ],
         ),
       ),
