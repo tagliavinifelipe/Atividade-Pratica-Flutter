@@ -12,7 +12,7 @@ class MeuApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Aula 15 - Câmera e Mídia',
-      // O roteiro usa Colors.rose, que não existe no Flutter.
+      // A cor "rose" do roteiro não existe no Flutter; usamos pink.
       theme: ThemeData(useMaterial3: true, colorSchemeSeed: Colors.pink),
       home: const PerfilScreen(),
     );
