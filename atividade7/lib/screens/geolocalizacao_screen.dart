@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../services/location_service.dart';
+import '../utils/constantes.dart';
+import '../utils/distancia.dart';
+import '../utils/precisao.dart';
 
 class GeolocalizacaoScreen extends StatefulWidget {
   GeolocalizacaoScreen({super.key, LocationService? locationService})
@@ -92,6 +95,25 @@ class _GeolocalizacaoScreenState extends State<GeolocalizacaoScreen> {
     super.dispose();
   }
 
+  double _distanciaAteFatec(Position posicao) {
+    return Geolocator.distanceBetween(
+      posicao.latitude,
+      posicao.longitude,
+      kLatitudeFatec,
+      kLongitudeFatec,
+    );
+  }
+
+  Widget _chipPrecisao(double metros) {
+    final NivelPrecisao nivel = classificarPrecisao(metros);
+    return Chip(
+      avatar: Icon(Icons.gps_fixed, color: nivel.cor, size: 18),
+      label: Text('${nivel.rotulo} (${metros.toStringAsFixed(1)} m)'),
+      backgroundColor: nivel.cor.withValues(alpha: 0.2),
+      side: BorderSide(color: nivel.cor),
+    );
+  }
+
   Widget _linhaInformacao(String rotulo, String valor) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -157,6 +179,15 @@ class _GeolocalizacaoScreenState extends State<GeolocalizacaoScreen> {
                           ? '${posicao.altitude.toStringAsFixed(1)} m'
                           : '--',
                     ),
+                    if (posicao != null) ...[
+                      const SizedBox(height: 8),
+                      _chipPrecisao(posicao.accuracy),
+                      const Divider(),
+                      _linhaInformacao(
+                        'Distância até a Fatec Matão:',
+                        formatarDistancia(_distanciaAteFatec(posicao)),
+                      ),
+                    ],
                   ],
                 ),
               ),
