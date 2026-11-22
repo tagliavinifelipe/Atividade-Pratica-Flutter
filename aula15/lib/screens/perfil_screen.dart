@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import '../services/media_service.dart';
+import 'foto_tela_cheia_screen.dart';
 
 class PerfilScreen extends StatefulWidget {
   PerfilScreen({super.key, MediaService? mediaService})
@@ -44,6 +45,17 @@ class _PerfilScreenState extends State<PerfilScreen> {
     setState(() {
       _imagemPerfil = null;
     });
+  }
+
+  void _abrirTelaCheia() {
+    final File? imagem = _imagemPerfil;
+    if (imagem == null) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (_) => FotoTelaCheiaScreen(imagem: imagem),
+      ),
+    );
   }
 
   void _mostrarOpcoes() {
@@ -107,19 +119,25 @@ class _PerfilScreenState extends State<PerfilScreen> {
             Center(
               child: Stack(
                 children: [
-                  CircleAvatar(
-                    radius: 70,
-                    backgroundColor: Colors.pink.shade100,
-                    backgroundImage: _imagemPerfil != null
-                        ? FileImage(_imagemPerfil!)
-                        : null,
-                    child: _imagemPerfil == null
-                        ? const Icon(
-                            Icons.person,
-                            size: 70,
-                            color: Colors.white,
-                          )
-                        : null,
+                  GestureDetector(
+                    onTap: _imagemPerfil != null ? _abrirTelaCheia : null,
+                    child: Hero(
+                      tag: kHeroFotoPerfil,
+                      child: CircleAvatar(
+                        radius: 70,
+                        backgroundColor: Colors.pink.shade100,
+                        backgroundImage: _imagemPerfil != null
+                            ? FileImage(_imagemPerfil!)
+                            : null,
+                        child: _imagemPerfil == null
+                            ? const Icon(
+                                Icons.person,
+                                size: 70,
+                                color: Colors.white,
+                              )
+                            : null,
+                      ),
+                    ),
                   ),
                   Positioned(
                     bottom: 0,
