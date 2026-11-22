@@ -40,6 +40,12 @@ class _PerfilScreenState extends State<PerfilScreen> {
     });
   }
 
+  void _removerFoto() {
+    setState(() {
+      _imagemPerfil = null;
+    });
+  }
+
   void _mostrarOpcoes() {
     showModalBottomSheet<void>(
       context: context,
@@ -64,6 +70,15 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   _capturarImagem(daCamera: false);
                 },
               ),
+              if (_imagemPerfil != null)
+                ListTile(
+                  leading: const Icon(Icons.delete, color: Colors.red),
+                  title: const Text('Remover Foto'),
+                  onTap: () {
+                    Navigator.pop(contextoSheet);
+                    _removerFoto();
+                  },
+                ),
             ],
           ),
         );
